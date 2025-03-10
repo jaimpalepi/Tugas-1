@@ -1,23 +1,22 @@
 <?php
-include 'koneksi.php';
+require_once "db.php";
+require_once "Employee.php";
 
-$stmt = $pdo->query("SELECT * FROM employees");
-$employees = $stmt->fetchAll();
+$db = (new Database())->getConnection();
+$employee = new Employee($db);
+$employees = $employee->read();
 ?>
-
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Karyawan</title>
+    <title>Manajemen Karyawan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 </head>
-<body class="container mt-4">
+<body>
+<div class="container mt-5">
     <h2>Manajemen Karyawan</h2>
     <a href="add.php" class="btn btn-primary mb-3">Tambah Karyawan</a>
-    <table id="employeeTable" class="table table-striped">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>ID</th>
@@ -28,28 +27,23 @@ $employees = $stmt->fetchAll();
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($employees as $emp): ?>
+            <?php foreach ($employees as $row) : ?>
                 <tr>
-                    <td><?= $emp['id']; ?></td>
-                    <td><?= $emp['name']; ?></td>
-                    <td><?= $emp['position']; ?></td>
-                    <td>Rp <?= number_format($emp['salary'], 2, ',', '.'); ?></td>
+                    <td><?= $row['id']; ?></td>
+                    <td><?= $row['name']; ?></td>
+                    <td><?= $row['position']; ?></td>
+                    <td><?= $row['salary']; ?></td>
                     <td>
-                        <a href="edit.php?id=<?= $emp['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="delete.php?id=<?= $emp['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?');">Hapus</a>
+                        <a href="edit.php?id=<?= $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                        <form method="post" action="delete.php" style="display:inline;">
+                            <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#employeeTable').DataTable();
-        });
-    </script>
+</div>
 </body>
 </html>
